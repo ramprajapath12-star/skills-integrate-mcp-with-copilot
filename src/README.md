@@ -5,7 +5,20 @@ A super simple FastAPI application that allows students to view and sign up for 
 ## Features
 
 - View all available extracurricular activities
-- Sign up for activities
+- Teacher sign-in required to register or unregister students
+
+## Teacher Access
+
+Configure the teacher account through the `TEACHER_USERNAME` and
+`TEACHER_PASSWORD` environment variables before starting the application. For
+example, set them in your deployment's secret/environment settings, then start
+the server as usual. Do not commit credentials or put them in a checked-in
+configuration file.
+
+If either variable is missing, teacher sign-in and activity changes are
+disabled. The activities and participant lists remain visible to students.
+Teacher credentials are held only in the browser's memory until sign-out or
+page reload. Deploy behind HTTPS so credentials are encrypted in transit.
 
 ## Getting Started
 
@@ -15,10 +28,12 @@ A super simple FastAPI application that allows students to view and sign up for 
    pip install fastapi uvicorn
    ```
 
-2. Run the application:
+2. Set the teacher credentials and run the application from the `src` directory:
 
    ```
-   python app.py
+   export TEACHER_USERNAME=teacher
+   export TEACHER_PASSWORD='<use a strong secret>'
+   uvicorn app:app --reload
    ```
 
 3. Open your browser and go to:
@@ -30,7 +45,9 @@ A super simple FastAPI application that allows students to view and sign up for 
 | Method | Endpoint                                                          | Description                                                         |
 | ------ | ----------------------------------------------------------------- | ------------------------------------------------------------------- |
 | GET    | `/activities`                                                     | Get all activities with their details and current participant count |
-| POST   | `/activities/{activity_name}/signup?email=student@mergington.edu` | Sign up for an activity                                             |
+| GET    | `/auth/verify`                                                     | Verify teacher credentials                                          |
+| POST   | `/activities/{activity_name}/signup?email=student@mergington.edu` | Teacher-only student signup                                         |
+| DELETE | `/activities/{activity_name}/unregister?email=student@mergington.edu` | Teacher-only student removal                                       |
 
 ## Data Model
 
